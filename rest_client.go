@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/faith2333/pagerduty-go/types"
 	"github.com/pkg/errors"
 	"io"
@@ -12,36 +13,45 @@ import (
 )
 
 type IRESTClient interface {
-	WithHttpClient(client *http.Client) Interface
-	WithEndpoint(endpoint types.Endpoint) Interface
-	WithToken(token string) Interface
-	WithBody(body interface{}) Interface
-	WithURLParams(urlParams map[string]string) Interface
-	POST() Interface
-	GET() Interface
-	PUT() Interface
-	DELETE() Interface
-	Do(ctx context.Context) (*types.Response, error)
+	WithHttpClient(client *http.Client) IRESTClient
+	WithEndpoint(endpoint types.Endpoint) IRESTClient
+	// WithToken the token will be replaced by the passed value
+	WithToken(token string) IRESTClient
+	// WithBody the body will be replaced by the passed value
+	WithBody(body interface{}) IRESTClient
+	// AddURLParam the k-v pair will be added to url params
+	AddURLParam(key, value string) IRESTClient
+	// WithURLParams the url params will be replaced by the passed value
+	WithURLParams(urlParams map[string]string) IRESTClient
+	POST() IRESTClient
+	// GET pathParams is a variable you can choose to pass or not, if you pass it will be added after the url with slash
+	// eg: if you request https://example.com/test and you pass the urlParams="123321" then the real url you request is https://example.com/test/123321
+	// and the urlParams just the first value take effect.
+	GET(pathParams ...string) IRESTClient
+	PUT() IRESTClient
+	DELETE() IRESTClient
+	Do(ctx context.Context) ([]byte, error)
 }
 
 type defaultRestClient struct {
-	lock       *sync.RWMutex
-	method     string
-	endpoint   types.Endpoint
-	token      string
-	body       interface{}
-	urlParams  map[string]string
-	httpClient *http.Client
+	lock         *sync.RWMutex
+	getPathParam string
+	method       string
+	endpoint     types.Endpoint
+	token        string
+	body         interface{}
+	urlParams    map[string]string
+	httpClient   *http.Client
 }
 
-func NewDefaultRestClient() Interface {
+func NewDefaultRestClient() IRESTClient {
 	return &defaultRestClient{
 		lock:       &sync.RWMutex{},
 		httpClient: &http.Client{},
 	}
 }
 
-func (dClient *defaultRestClient) WithHttpClient(httpClient *http.Client) Interface {
+func (dClient *defaultRestClient) WithHttpClient(httpClient *http.Client) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -49,7 +59,7 @@ func (dClient *defaultRestClient) WithHttpClient(httpClient *http.Client) Interf
 	return dClient
 }
 
-func (dClient *defaultRestClient) WithEndpoint(endpoint types.Endpoint) Interface {
+func (dClient *defaultRestClient) WithEndpoint(endpoint types.Endpoint) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -57,7 +67,7 @@ func (dClient *defaultRestClient) WithEndpoint(endpoint types.Endpoint) Interfac
 	return dClient
 }
 
-func (dClient *defaultRestClient) WithToken(token string) Interface {
+func (dClient *defaultRestClient) WithToken(token string) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -65,7 +75,7 @@ func (dClient *defaultRestClient) WithToken(token string) Interface {
 	return dClient
 }
 
-func (dClient *defaultRestClient) POST() Interface {
+func (dClient *defaultRestClient) POST() IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -73,15 +83,18 @@ func (dClient *defaultRestClient) POST() Interface {
 	return dClient
 }
 
-func (dClient *defaultRestClient) GET() Interface {
+func (dClient *defaultRestClient) GET(pathParams ...string) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
+	if len(pathParams) != 0 {
+		dClient.getPathParam = pathParams[0]
+	}
 	dClient.method = "GET"
 	return dClient
 }
 
-func (dClient *defaultRestClient) PUT() Interface {
+func (dClient *defaultRestClient) PUT() IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -89,7 +102,7 @@ func (dClient *defaultRestClient) PUT() Interface {
 	return dClient
 }
 
-func (dClient *defaultRestClient) DELETE() Interface {
+func (dClient *defaultRestClient) DELETE() IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -97,7 +110,7 @@ func (dClient *defaultRestClient) DELETE() Interface {
 	return dClient
 }
 
-func (dClient *defaultRestClient) WithBody(body interface{}) Interface {
+func (dClient *defaultRestClient) WithBody(body interface{}) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -105,7 +118,18 @@ func (dClient *defaultRestClient) WithBody(body interface{}) Interface {
 	return dClient
 }
 
-func (dClient *defaultRestClient) WithURLParams(urlParams map[string]string) Interface {
+func (dClient *defaultRestClient) AddURLParam(key, value string) IRESTClient {
+	dClient.lock.Lock()
+	defer dClient.lock.Unlock()
+
+	if dClient.urlParams == nil {
+		dClient.urlParams = make(map[string]string)
+	}
+	dClient.urlParams[key] = value
+	return dClient
+}
+
+func (dClient *defaultRestClient) WithURLParams(urlParams map[string]string) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -113,7 +137,7 @@ func (dClient *defaultRestClient) WithURLParams(urlParams map[string]string) Int
 	return dClient
 }
 
-func (dClient *defaultRestClient) Do(ctx context.Context) (*types.Response, error) {
+func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 	dClient.lock.RLock()
 	defer dClient.lock.RUnlock()
 
@@ -132,12 +156,17 @@ func (dClient *defaultRestClient) Do(ctx context.Context) (*types.Response, erro
 		return nil, errors.New("please call WithToken method and pass non-empty token into it before call Do method")
 	}
 
+	url := dClient.endpoint.String()
+	if dClient.getPathParam != "" {
+		url += "/" + dClient.getPathParam
+	}
+
 	bodyBuf, err := json.Marshal(dClient.body)
 	if err != nil {
 		return nil, errors.Errorf("marshal request body %q failed:", dClient.body)
 	}
 
-	req, err := http.NewRequest(dClient.method, dClient.endpoint.String(), bytes.NewBuffer(bodyBuf))
+	req, err := http.NewRequest(dClient.method, url, bytes.NewBuffer(bodyBuf))
 	if err != nil {
 		return nil, errors.Wrap(err, "make request failed")
 	}
@@ -153,6 +182,8 @@ func (dClient *defaultRestClient) Do(ctx context.Context) (*types.Response, erro
 
 	req.Header.Add("Authorization", "Token token="+dClient.token)
 	req.Header.Add("Content-Type", "application/json")
+
+	fmt.Println(req.URL.String())
 
 	rawResp, err := dClient.httpClient.Do(req)
 	defer func() {
@@ -171,11 +202,13 @@ func (dClient *defaultRestClient) Do(ctx context.Context) (*types.Response, erro
 		return nil, errors.Wrap(err, "read response body failed")
 	}
 
-	resp := &types.Response{}
-	err = json.Unmarshal(respBytes, &resp)
-	if err != nil {
-		return nil, errors.Wrap(err, "unmarshal response body failed")
+	errResp := &types.ErrResponse{}
+	err = json.Unmarshal(respBytes, &errResp)
+	if err == nil {
+		if errResp.Error != nil {
+			return nil, errors.New(errResp.Error.Message)
+		}
 	}
 
-	return resp, nil
+	return respBytes, nil
 }

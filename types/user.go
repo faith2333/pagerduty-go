@@ -9,3 +9,9 @@ type UserPayload struct {
 	ContactMethods []ContactMethod `json:"contact_methods,omitempty"`
 	TeamIDs        []string        `json:"team_ids,omitempty"`
 }
+
+type User struct {
+}
+
+type GetUserResp struct {
+}

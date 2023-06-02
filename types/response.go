@@ -1,7 +1,7 @@
 package types
 
-type Response struct {
-	Error struct {
+type ErrResponse struct {
+	Error *struct {
 		Message string `json:"message"`
 	} `json:"error"`
 	Code int         `json:"code"`
