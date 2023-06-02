@@ -101,6 +101,9 @@ func (dClient *defaultPagerDutyClient) WithURLParams(urlParams map[string]string
 }
 
 func (dClient *defaultPagerDutyClient) Do(ctx context.Context) (*types.Response, error) {
+	dClient.lock.RLock()
+	defer dClient.lock.RUnlock()
+
 	select {
 	case <-ctx.Done():
 		return nil, errors.New("context done received")
