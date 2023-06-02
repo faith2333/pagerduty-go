@@ -11,7 +11,20 @@ import (
 	"sync"
 )
 
-type defaultPagerDutyClient struct {
+type IRESTClient interface {
+	WithHttpClient(client *http.Client) Interface
+	WithEndpoint(endpoint types.Endpoint) Interface
+	WithToken(token string) Interface
+	WithBody(body interface{}) Interface
+	WithURLParams(urlParams map[string]string) Interface
+	POST() Interface
+	GET() Interface
+	PUT() Interface
+	DELETE() Interface
+	Do(ctx context.Context) (*types.Response, error)
+}
+
+type defaultRestClient struct {
 	lock       *sync.RWMutex
 	method     string
 	endpoint   types.Endpoint
@@ -21,14 +34,14 @@ type defaultPagerDutyClient struct {
 	httpClient *http.Client
 }
 
-func NewDefaultPagerDutyClient() Interface {
-	return &defaultPagerDutyClient{
+func NewDefaultRestClient() Interface {
+	return &defaultRestClient{
 		lock:       &sync.RWMutex{},
 		httpClient: &http.Client{},
 	}
 }
 
-func (dClient *defaultPagerDutyClient) WithHttpClient(httpClient *http.Client) Interface {
+func (dClient *defaultRestClient) WithHttpClient(httpClient *http.Client) Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -36,7 +49,7 @@ func (dClient *defaultPagerDutyClient) WithHttpClient(httpClient *http.Client) I
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) WithEndpoint(endpoint types.Endpoint) Interface {
+func (dClient *defaultRestClient) WithEndpoint(endpoint types.Endpoint) Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -44,7 +57,7 @@ func (dClient *defaultPagerDutyClient) WithEndpoint(endpoint types.Endpoint) Int
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) WithToken(token string) Interface {
+func (dClient *defaultRestClient) WithToken(token string) Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -52,7 +65,7 @@ func (dClient *defaultPagerDutyClient) WithToken(token string) Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) POST() Interface {
+func (dClient *defaultRestClient) POST() Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -60,7 +73,7 @@ func (dClient *defaultPagerDutyClient) POST() Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) GET() Interface {
+func (dClient *defaultRestClient) GET() Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -68,7 +81,7 @@ func (dClient *defaultPagerDutyClient) GET() Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) PUT() Interface {
+func (dClient *defaultRestClient) PUT() Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -76,7 +89,7 @@ func (dClient *defaultPagerDutyClient) PUT() Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) DELETE() Interface {
+func (dClient *defaultRestClient) DELETE() Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -84,7 +97,7 @@ func (dClient *defaultPagerDutyClient) DELETE() Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) WithBody(body interface{}) Interface {
+func (dClient *defaultRestClient) WithBody(body interface{}) Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -92,7 +105,7 @@ func (dClient *defaultPagerDutyClient) WithBody(body interface{}) Interface {
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) WithURLParams(urlParams map[string]string) Interface {
+func (dClient *defaultRestClient) WithURLParams(urlParams map[string]string) Interface {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
@@ -100,7 +113,7 @@ func (dClient *defaultPagerDutyClient) WithURLParams(urlParams map[string]string
 	return dClient
 }
 
-func (dClient *defaultPagerDutyClient) Do(ctx context.Context) (*types.Response, error) {
+func (dClient *defaultRestClient) Do(ctx context.Context) (*types.Response, error) {
 	dClient.lock.RLock()
 	defer dClient.lock.RUnlock()
 
