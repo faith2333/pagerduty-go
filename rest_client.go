@@ -8,11 +8,13 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 )
 
 type IRESTClient interface {
 	WithHttpClient(client *http.Client) IRESTClient
+	WithHost(host string) IRESTClient
 	WithEndpoint(endpoint types.Endpoint) IRESTClient
 	// WithToken the token will be replaced by the passed value
 	WithToken(token string) IRESTClient
@@ -34,6 +36,7 @@ type IRESTClient interface {
 
 type defaultRestClient struct {
 	lock       *sync.RWMutex
+	host       string
 	addedPath  string
 	method     string
 	endpoint   types.Endpoint
@@ -47,6 +50,7 @@ func NewDefaultRestClient() IRESTClient {
 	return &defaultRestClient{
 		lock:       &sync.RWMutex{},
 		httpClient: &http.Client{},
+		host:       types.HostDefault,
 	}
 }
 
@@ -55,6 +59,14 @@ func (dClient *defaultRestClient) WithHttpClient(httpClient *http.Client) IRESTC
 	defer dClient.lock.Unlock()
 
 	dClient.httpClient = httpClient
+	return dClient
+}
+
+func (dClient *defaultRestClient) WithHost(host string) IRESTClient {
+	dClient.lock.Lock()
+	defer dClient.lock.Unlock()
+
+	dClient.host = host
 	return dClient
 }
 
@@ -160,9 +172,13 @@ func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 		return nil, errors.New("please call WithToken method and pass non-empty token into it before call Do method")
 	}
 
-	url := dClient.endpoint.String()
+	url := dClient.host + dClient.endpoint.String()
 	if dClient.addedPath != "" {
-		url += "/" + dClient.addedPath
+		if strings.HasPrefix(dClient.addedPath, "/") {
+			url += dClient.addedPath
+		} else {
+			url += "/" + dClient.addedPath
+		}
 	}
 
 	bodyBuf, err := json.Marshal(dClient.body)

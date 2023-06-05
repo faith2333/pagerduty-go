@@ -1,18 +1,19 @@
 package types
 
 const (
-	APIBase = "https://api.pagerduty.com"
+	HostDefault = "https://api.pagerduty.com"
 
-	EndpointUsers              Endpoint = APIBase + "/users"
-	EndpointServices           Endpoint = APIBase + "/services"
-	EndpointTeams              Endpoint = APIBase + "/teams"
-	EndpointSchedules          Endpoint = APIBase + "/schedules"
-	EndpointIncidents          Endpoint = APIBase + "/incidents"
-	EndpointEscalationPolicies Endpoint = APIBase + "/escalation_policies"
-	EndpointLogEntries         Endpoint = APIBase + "/log_entries"
+	EndpointUsers              Endpoint = "/users"
+	EndpointServices           Endpoint = "/services"
+	EndpointTeams              Endpoint = "/teams"
+	EndpointSchedules          Endpoint = "/schedules"
+	EndpointIncidents          Endpoint = "/incidents"
+	EndpointEscalationPolicies Endpoint = "/escalation_policies"
+	EndpointLogEntries         Endpoint = "/log_entries"
 )
 
-var AllEndpoints = []Endpoint{EndpointUsers, EndpointServices, EndpointTeams, EndpointSchedules, EndpointIncidents, EndpointEscalationPolicies, EndpointLogEntries}
+var AllEndpoints = []Endpoint{EndpointUsers, EndpointServices, EndpointTeams,
+	EndpointSchedules, EndpointIncidents, EndpointEscalationPolicies, EndpointLogEntries}
 
 type Endpoint string
 

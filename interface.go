@@ -6,6 +6,7 @@ import (
 )
 
 type Interface interface {
+	WithRESTClient(restClient IRESTClient) Interface
 	IUser
 	IService
 }
