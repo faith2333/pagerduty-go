@@ -7,6 +7,7 @@ It helps you manipulate pagerduty via go easily. includes:
 * CRUD for pagerduty resource object
 * Incident operation 
 * Provides a structured resource object definition.
+* Provides a RESTClient.
 
 ## Project Status
 
