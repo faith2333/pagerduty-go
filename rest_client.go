@@ -25,7 +25,8 @@ type IRESTClient interface {
 	// WithURLParams the url params will be replaced by the passed value
 	WithURLParams(urlParams map[string]string) IRESTClient
 	// AddPath the passed path will be added after the endpoint.
-	// eg: the raw endpoint is "https://example.com/users", pass path=123, then the real url you have called is "https://example.com/users/123å"
+	// If the method called multiple times, the value passed in will be appended after the url in order.
+	// eg: the raw endpoint is "https://example.com/users", pass path=123 and path=345, then the real url you have called is "https://example.com/users/123/345"
 	AddPath(path string) IRESTClient
 	POST() IRESTClient
 	GET() IRESTClient
@@ -37,7 +38,7 @@ type IRESTClient interface {
 type defaultRestClient struct {
 	lock       *sync.RWMutex
 	host       string
-	addedPath  string
+	addedPaths []string
 	method     string
 	endpoint   types.Endpoint
 	token      string
@@ -149,7 +150,7 @@ func (dClient *defaultRestClient) AddPath(path string) IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
-	dClient.addedPath = path
+	dClient.addedPaths = append(dClient.addedPaths, path)
 	return dClient
 }
 
@@ -173,11 +174,11 @@ func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 	}
 
 	url := dClient.host + dClient.endpoint.String()
-	if dClient.addedPath != "" {
-		if strings.HasPrefix(dClient.addedPath, "/") {
-			url += dClient.addedPath
+	for _, path := range dClient.addedPaths {
+		if strings.HasPrefix(path, "/") {
+			url += path
 		} else {
-			url += "/" + dClient.addedPath
+			url += "/" + path
 		}
 	}
 
