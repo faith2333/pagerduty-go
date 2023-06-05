@@ -1,12 +1,5 @@
 package types
 
-type CreateAndUpdateServicePayload struct {
-	Name                   string `json:"name"`
-	Description            string `json:"description"`
-	AutoResolve            bool   `json:"auto_resolve_timeout"`
-	AcknowledgementTimeout int    `json:"acknowledgement_timeout"`
-}
-
 type Service struct {
 	BaseObject
 	// The name of the service
@@ -68,6 +61,17 @@ type Service struct {
 	//
 	//Example: {"enabled":true,"timeout":300}
 	AutoPauseNotificationsParameters AutoPauseNotificationsParameters `json:"auto_pause_notifications_parameters"`
+}
+
+type CreateAndUpdateServicePayload struct {
+	Name                   string `json:"name"`
+	Description            string `json:"description"`
+	AutoResolve            bool   `json:"auto_resolve_timeout"`
+	AcknowledgementTimeout int    `json:"acknowledgement_timeout"`
+}
+
+type GetServiceResp struct {
+	Service *Service `json:"service"`
 }
 
 type ServiceStatus string

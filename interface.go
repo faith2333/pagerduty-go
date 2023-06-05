@@ -7,6 +7,7 @@ import (
 
 type Interface interface {
 	IUser
+	IService
 }
 
 type IUser interface {
@@ -36,5 +37,11 @@ type IService interface {
 	GetService(ctx context.Context, id string) (*types.Service, error)
 	// CreateService
 	//   https://developer.pagerduty.com/api-reference/7062f2631b397-create-a-service
-	CreateService(ctx context.Context)
+	CreateService(ctx context.Context, payload *types.CreateAndUpdateServicePayload) (*types.Service, error)
+	// UpdateService
+	//   https://developer.pagerduty.com/api-reference/fbc6e9f4ef8eb-update-a-service
+	UpdateService(ctx context.Context, payload *types.CreateAndUpdateServicePayload) (*types.Service, error)
+	// DeleteService
+	//   https://developer.pagerduty.com/api-reference/fbc6e9f4ef8eb-update-a-service
+	DeleteService(ctx context.Context, id string) error
 }

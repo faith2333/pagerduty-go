@@ -1,6 +1,7 @@
 package pagerduty_go
 
 import (
+	"encoding/json"
 	"sync"
 )
 
@@ -23,4 +24,8 @@ func (pd *pagerduty) WithRESTClient(restClient IRESTClient) Interface {
 
 	pd.restClient = restClient
 	return pd
+}
+
+func (pd *pagerduty) transformJson(source []byte, target interface{}) error {
+	return json.Unmarshal(source, &target)
 }

@@ -8,6 +8,6 @@ import (
 var testPagerDuty Interface
 
 func TestMain(m *testing.M) {
-	testPagerDuty = NewPagerDuty("YOU_API_TOKEN")
+	testPagerDuty = NewPagerDuty("y_NbAkKc66ryYTWUXYEu")
 	os.Exit(m.Run())
 }
