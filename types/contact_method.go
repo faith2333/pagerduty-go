@@ -14,20 +14,17 @@ func (cm ContactMethodType) String() string {
 }
 
 type ContactMethod interface {
+	GetAddress() string
 }
 
 type BaseContactMethod struct {
-	ID      string            `json:"id"`
+	Base
 	Type    ContactMethodType `json:"type"`
-	Summary string            `json:"summary"`
-	// A short-form, server-generated string that provides succinct,
-	// important information about an object suitable for primary labeling of an entity in a client.
-	// In many cases, this will be identical to name, though it is not intended to be an identifier.
-	Self string `json:"self"`
-	// a URL at which the entity is uniquely displayed in the Web app
-	HtmlURL string `json:"html_url"`
-	// The "address" to deliver to: email, phone number, etc., depending on the type.
-	Address string `json:"address"`
+	Address string            `json:"address"`
+}
+
+func (bcm *BaseContactMethod) GetAddress() string {
+	return bcm.Address
 }
 
 type PhoneContactMethod struct {
