@@ -54,9 +54,10 @@ func (pd *pagerduty) DeleteUser(ctx context.Context, userID string) error {
 	return err
 }
 
-func (pd *pagerduty) UpdateUser(ctx context.Context, payload *types.CreateAndUpdateUserPayload) (*types.User, error) {
+func (pd *pagerduty) UpdateUser(ctx context.Context, uid string, payload *types.CreateAndUpdateUserPayload) (*types.User, error) {
 	resp, err := pd.restClient.WithEndpoint(types.EndpointUsers).
 		WithToken(pd.token).
+		AddPath(uid).
 		WithBody(payload).
 		PUT().
 		Do(ctx)

@@ -22,7 +22,7 @@ type IUser interface {
 	// Users are members of a PagerDuty account that have the ability to interact with Incidents and other data on the account.
 	//      Scoped OAuth requires: users.write
 	//  reference: https://developer.pagerduty.com/api-reference/ce6799fc6191a-update-a-user
-	UpdateUser(ctx context.Context, payload *types.CreateAndUpdateUserPayload) (*types.User, error)
+	UpdateUser(ctx context.Context, uid string, payload *types.CreateAndUpdateUserPayload) (*types.User, error)
 	// DeleteUser Remove an existing user.
 	// Returns 400 if the user has assigned incidents unless your pricing plan has the offboarding feature and the account is configured appropriately.
 	// Note that the incidents reassignment process is asynchronous and has no guarantee to complete before the api call return.
