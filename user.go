@@ -8,7 +8,10 @@ import (
 )
 
 func (pd *pagerduty) GetUser(ctx context.Context, id string) (*types.User, error) {
-	resp, err := pd.restClient.WithEndpoint(types.EndpointUsers).WithToken(pd.token).GET(id).Do(ctx)
+	resp, err := pd.restClient.WithEndpoint(types.EndpointUsers).WithToken(pd.token).
+		AddPath(id).
+		GET().
+		Do(ctx)
 	if err != nil {
 		return nil, err
 	}
