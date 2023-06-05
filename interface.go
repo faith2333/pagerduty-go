@@ -7,4 +7,5 @@ import (
 
 type Interface interface {
 	GetUser(ctx context.Context, id string) (*types.User, error)
+	CreateUser(ctx context.Context, payload *types.CreateUserPayload) (*types.User, error)
 }

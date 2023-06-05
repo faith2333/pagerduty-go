@@ -1,6 +1,8 @@
 package pagerduty_go
 
-import "sync"
+import (
+	"sync"
+)
 
 type pagerduty struct {
 	lock       *sync.RWMutex
