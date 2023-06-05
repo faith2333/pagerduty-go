@@ -9,6 +9,9 @@ It helps you manipulate pagerduty via go easily. includes:
 * Provides a structured resource object definition.
 * Provides a RESTClient.
 
+## Reference
+[Pagerduty API](https://developer.pagerduty.com/api-reference/e65c5833eeb07-pager-duty-api)
+
 ## Project Status
 
 This project was just started, and will be finished as soon as possible.
