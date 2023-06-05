@@ -6,7 +6,7 @@ import (
 )
 
 func TestPagerduty_GetUser(t *testing.T) {
-	user, err := testPagerDuty.GetUser(context.Background(), "P79NPYV")
+	user, err := testPagerDuty.GetUser(context.Background(), "123")
 	if err != nil {
 		t.Log(err)
 		t.FailNow()
