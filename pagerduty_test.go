@@ -8,7 +8,6 @@ import (
 var testPagerDuty Interface
 
 func TestMain(m *testing.M) {
-	testPagerDuty = NewPagerDuty("y_NbAkKc66ryYTWUXYEu").
-		WithRESTClient(NewDefaultRestClient().WithHost("https://stoplight.io/mocks/pagerduty-upgrade/api-schema/2748099"))
+	testPagerDuty = NewPagerDuty("YOUR_TOKEN")
 	os.Exit(m.Run())
 }

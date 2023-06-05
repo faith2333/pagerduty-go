@@ -16,3 +16,15 @@ func TestPagerduty_GetUser(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestPagerduty_ListUserContactMethods(t *testing.T) {
+	contactMethods, err := testPagerDuty.ListUserContactMethods(context.Background(), "YOUR_UID")
+	if err != nil {
+		t.Log(err)
+		t.FailNow()
+	}
+
+	if len(contactMethods) == 0 {
+		t.Log("resp is empty")
+	}
+}

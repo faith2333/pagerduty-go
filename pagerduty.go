@@ -13,6 +13,7 @@ type pagerduty struct {
 
 func NewPagerDuty(token string) Interface {
 	return &pagerduty{
+		lock:       &sync.RWMutex{},
 		token:      token,
 		restClient: NewDefaultRestClient(),
 	}

@@ -3,6 +3,7 @@ package pagerduty_go
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/faith2333/pagerduty-go/types"
 	"github.com/pkg/errors"
 )
@@ -71,6 +72,88 @@ func (pd *pagerduty) UpdateUser(ctx context.Context, payload *types.CreateAndUpd
 	return getUserResp.User, nil
 }
 
+func (pd *pagerduty) ListUserContactMethods(ctx context.Context, uid string) ([]*types.ContactMethod, error) {
+	resp, err := pd.restClient.WithToken(pd.token).
+		WithEndpoint(types.EndpointUsers).
+		AddPath(pd.makeUserContactMethodPath(uid)).
+		GET().
+		Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	listResp, err := pd.respToListUserContactMethodResp(resp)
+	if err != nil {
+		return nil, err
+	}
+	return listResp.ContactMethods, nil
+}
+
+func (pd *pagerduty) GetUserContactMethod(ctx context.Context, uid, contactMethodID string) (*types.ContactMethod, error) {
+	resp, err := pd.restClient.WithToken(pd.token).
+		WithEndpoint(types.EndpointUsers).
+		AddPath(pd.makeUserContactMethodPath(uid)).
+		AddPath(contactMethodID).
+		GET().
+		Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	getResp, err := pd.respToGetUserContactMethodResp(resp)
+	if err != nil {
+		return nil, err
+	}
+	return getResp.ContactMethod, nil
+}
+
+func (pd *pagerduty) CreateUserContactMethod(ctx context.Context, uid string, payload *types.CreateAndUpdateContactMethodPayload) (*types.ContactMethod, error) {
+	resp, err := pd.restClient.WithToken(pd.token).
+		WithEndpoint(types.EndpointUsers).
+		AddPath(pd.makeUserContactMethodPath(uid)).
+		WithBody(payload).
+		POST().
+		Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	getResp, err := pd.respToGetUserContactMethodResp(resp)
+	if err != nil {
+		return nil, err
+	}
+	return getResp.ContactMethod, nil
+}
+
+func (pd *pagerduty) UpdateUserContactMethod(ctx context.Context, uid, contactMethodID string, payload *types.CreateAndUpdateContactMethodPayload) (*types.ContactMethod, error) {
+	resp, err := pd.restClient.WithToken(pd.token).
+		WithEndpoint(types.EndpointUsers).
+		AddPath(pd.makeUserContactMethodPath(uid)).
+		AddPath(contactMethodID).
+		WithBody(payload).
+		PUT().
+		Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	getResp, err := pd.respToGetUserContactMethodResp(resp)
+	if err != nil {
+		return nil, err
+	}
+	return getResp.ContactMethod, nil
+}
+
+func (pd *pagerduty) DeleteUserContactMethod(ctx context.Context, uid, contactMethodID string) error {
+	_, err := pd.restClient.WithToken(pd.token).
+		WithEndpoint(types.EndpointUsers).
+		AddPath(pd.makeUserContactMethodPath(uid)).
+		AddPath(contactMethodID).
+		DELETE().
+		Do(ctx)
+	return err
+}
+
 func (pd *pagerduty) respToGetUserResp(resp []byte) (*types.GetUserResp, error) {
 	getUserResp := &types.GetUserResp{}
 	err := json.Unmarshal(resp, &getUserResp)
@@ -79,4 +162,18 @@ func (pd *pagerduty) respToGetUserResp(resp []byte) (*types.GetUserResp, error) 
 	}
 
 	return getUserResp, nil
+}
+
+func (pd *pagerduty) makeUserContactMethodPath(uid string) string {
+	return fmt.Sprintf("%s/contact_methods", uid)
+}
+
+func (pd *pagerduty) respToGetUserContactMethodResp(resp []byte) (getResp *types.GetContactMethodResp, err error) {
+	err = json.Unmarshal(resp, &getResp)
+	return
+}
+
+func (pd *pagerduty) respToListUserContactMethodResp(resp []byte) (listResp *types.ListContactMethodsResp, err error) {
+	err = json.Unmarshal(resp, &listResp)
+	return
 }

@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 const (
 	ContactMethodTypePhone            ContactMethodType = "phone_contact_method"
 	ContactMethodTypeEmail            ContactMethodType = "email_contact_method"
@@ -49,8 +51,6 @@ func (dt DeviceType) String() string {
 }
 
 type PushContactMethod struct {
-	BaseContactMethod
-
 	DeviceType DeviceType `json:"device_type"`
 	CreatedAt  string     `json:"created_at"`
 	Sounds     []Sound    `json:"sounds"`
@@ -58,9 +58,35 @@ type PushContactMethod struct {
 }
 
 type EmailContactMethod struct {
-	BaseContactMethod
-
 	// Send an abbreviated email message instead of the standard email output. Useful for email-to-SMS gateways and email based pagers.
 	// default is false
 	SendShortEmail bool `json:"send_short_email"`
+}
+
+type CreateAndUpdateContactMethodPayload struct {
+	Type ContactMethodType `json:"type"`
+
+	// The 1-to-3 digit country calling code. used only for phone contact method
+	CountryCode int `json:"country_code"`
+	// for push contact method only
+	Sounds []Sound `json:"sounds"`
+	// Time at which the contact method was created. push contact method only
+	CreatedAt time.Time `json:"created_at"`
+	// Send an abbreviated email message instead of the standard email output.
+	// Useful for email-to-SMS gateways and email based pagers.
+	// default: false
+	SendShortEmail bool `json:"send_short_email"`
+
+	// The label (e.g., "Work", "Mobile", etc.).
+	Label string `json:"label"`
+	// The "address" to deliver to: email, phone number, etc., depending on the type.
+	Address string `json:"address"`
+}
+
+type GetContactMethodResp struct {
+	ContactMethod *ContactMethod `json:"contact_method"`
+}
+
+type ListContactMethodsResp struct {
+	ContactMethods []*ContactMethod `json:"contact_methods"`
 }
