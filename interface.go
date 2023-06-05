@@ -2,6 +2,7 @@ package pagerduty_go
 
 import (
 	"context"
+	"github.com/faith2333/pagerduty-go/event"
 	"github.com/faith2333/pagerduty-go/types"
 )
 
@@ -9,6 +10,8 @@ type Interface interface {
 	WithRESTClient(restClient IRESTClient) Interface
 	IUser
 	IService
+	IIncident
+	IEvent
 }
 
 type IUser interface {
@@ -63,7 +66,7 @@ type IService interface {
 	DeleteService(ctx context.Context, id string) error
 }
 
-type Incident interface {
+type IIncident interface {
 	// ListIncidents
 	//  reference: https://developer.pagerduty.com/api-reference/9d0b4b12e36f9-list-incidents
 	ListIncidents(ctx context.Context, params *types.ListIncidentsReq) (*types.ListIncidentsResp, error)
@@ -73,4 +76,8 @@ type Incident interface {
 	// CreateIncident
 	//  reference: https://developer.pagerduty.com/api-reference/a7d81b0e9200f-create-an-incident
 	CreateIncident(ctx context.Context, payload *types.CreateIncidentPayload) (*types.Incident, error)
+}
+
+type IEvent interface {
+	SendEvent(ctx context.Context, payload *event.SendEventReq) (*event.SendEventResp, error)
 }
