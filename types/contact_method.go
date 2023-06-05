@@ -13,8 +13,11 @@ func (cm ContactMethodType) String() string {
 	return string(cm)
 }
 
-type ContactMethod interface {
-	GetAddress() string
+type ContactMethod struct {
+	BaseContactMethod
+	PhoneContactMethod
+	PushContactMethod
+	EmailContactMethod
 }
 
 type BaseContactMethod struct {
@@ -23,12 +26,7 @@ type BaseContactMethod struct {
 	Address string            `json:"address"`
 }
 
-func (bcm *BaseContactMethod) GetAddress() string {
-	return bcm.Address
-}
-
 type PhoneContactMethod struct {
-	BaseContactMethod
 	// The 1-to-3 digit country calling code. >=1 and <= 1999
 	CountryCode int `json:"country_code"`
 	// If true, this phone is capable of receiving SMS messages.

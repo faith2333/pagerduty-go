@@ -8,6 +8,6 @@ import (
 var testPagerDuty Interface
 
 func TestMain(m *testing.M) {
-	testPagerDuty = NewPagerDuty("y_NbAkKc66ryYTWUXYEu")
+	testPagerDuty = NewPagerDuty("u+nhy-LtvijP-S9nozzQ")
 	os.Exit(m.Run())
 }
