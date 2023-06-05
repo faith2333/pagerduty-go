@@ -6,6 +6,10 @@ import (
 )
 
 type Interface interface {
+	IUser
+}
+
+type IUser interface {
 	GetUser(ctx context.Context, id string) (*types.User, error)
 	// CreateUser Create a new user.
 	// Users are members of a PagerDuty account that have the ability to interact with Incidents and other data on the account.
@@ -24,4 +28,13 @@ type Interface interface {
 	//      Scoped OAuth requires: users.write
 	// https://developer.pagerduty.com/api-reference/f99c2c2bba70b-delete-a-user
 	DeleteUser(ctx context.Context, id string) error
+}
+
+type IService interface {
+	// GetService
+	//   https://developer.pagerduty.com/api-reference/165ad96a22ffd-get-a-service
+	GetService(ctx context.Context, id string) (*types.Service, error)
+	// CreateService
+	//   https://developer.pagerduty.com/api-reference/7062f2631b397-create-a-service
+	CreateService(ctx context.Context)
 }
