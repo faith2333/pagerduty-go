@@ -28,6 +28,8 @@ go get github.com/faith2333/pagerduty-go
 ```
 
 ## Example
+
+### Start
 ```go
 package main
 
@@ -40,10 +42,11 @@ import (
 
 func main() {
 	api := pagerduty_go.NewPagerDuty("YOUR_TOKEN")
-	user, err := api.GetUser(context.Background(), "YOUR_USER_ID")
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(user.Name)
+	fmt.Println("new api client",api)
 }
 ```
+
+You should replace the <YOUR_TOKEN> with the user token which created in pagerduty.
+
+### More Example
+* [USER](./example/USER.md)
