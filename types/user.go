@@ -1,9 +1,7 @@
 package types
 
 type User struct {
-	Base
-	// allowed value: user
-	Type Type   `json:"type"`
+	BaseObject
 	Name string `json:"name"`
 	// The user's email address.
 	Email string `json:"email"`
@@ -28,9 +26,9 @@ type User struct {
 	// The list of contact methods for the user.
 	ContactMethods []ContactMethod `json:"contact_methods"`
 	// The list of notification rules for the user.
-	NotificationRules []NotificationRule `json:"notification_rules"`
+	NotificationRules []BaseObjectReference `json:"notification_rules"`
 	// The License assigned to the User
-	License License `json:"license"`
+	License BaseObjectReference `json:"license"`
 }
 
 type CreateAndUpdateUserPayload struct {
@@ -51,7 +49,7 @@ type CreateAndUpdateUserPayload struct {
 	// The user's title.
 	JobTitle string `json:"job_title"`
 	// The License assigned to the User
-	License License `json:"license"`
+	License BaseObjectReference `json:"license"`
 }
 type GetUserResp struct {
 	User *User `json:"user"`

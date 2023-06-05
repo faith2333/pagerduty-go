@@ -18,7 +18,7 @@ type ContactMethod interface {
 }
 
 type BaseContactMethod struct {
-	Base
+	BaseObject
 	Type    ContactMethodType `json:"type"`
 	Address string            `json:"address"`
 }
