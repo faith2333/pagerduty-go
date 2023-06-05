@@ -23,25 +23,25 @@ type IRESTClient interface {
 	AddURLParam(key, value string) IRESTClient
 	// WithURLParams the url params will be replaced by the passed value
 	WithURLParams(urlParams map[string]string) IRESTClient
+	// AddPath the passed path will be added after the endpoint.
+	// eg: the raw endpoint is "https://example.com/users", pass path=123, then the real url you have called is "https://example.com/users/123å"
+	AddPath(path string) IRESTClient
 	POST() IRESTClient
-	// GET pathParams is a variable you can choose to pass or not, if you pass it will be added after the url with slash
-	// eg: if you request https://example.com/test and you pass the urlParams="123321" then the real url you request is https://example.com/test/123321
-	// and the urlParams just the first value take effect.
-	GET(pathParams ...string) IRESTClient
+	GET() IRESTClient
 	PUT() IRESTClient
 	DELETE() IRESTClient
 	Do(ctx context.Context) ([]byte, error)
 }
 
 type defaultRestClient struct {
-	lock         *sync.RWMutex
-	getPathParam string
-	method       string
-	endpoint     types.Endpoint
-	token        string
-	body         interface{}
-	urlParams    map[string]string
-	httpClient   *http.Client
+	lock       *sync.RWMutex
+	addedPath  string
+	method     string
+	endpoint   types.Endpoint
+	token      string
+	body       interface{}
+	urlParams  map[string]string
+	httpClient *http.Client
 }
 
 func NewDefaultRestClient() IRESTClient {
@@ -83,13 +83,10 @@ func (dClient *defaultRestClient) POST() IRESTClient {
 	return dClient
 }
 
-func (dClient *defaultRestClient) GET(pathParams ...string) IRESTClient {
+func (dClient *defaultRestClient) GET() IRESTClient {
 	dClient.lock.Lock()
 	defer dClient.lock.Unlock()
 
-	if len(pathParams) != 0 {
-		dClient.getPathParam = pathParams[0]
-	}
 	dClient.method = "GET"
 	return dClient
 }
@@ -137,6 +134,14 @@ func (dClient *defaultRestClient) WithURLParams(urlParams map[string]string) IRE
 	return dClient
 }
 
+func (dClient *defaultRestClient) AddPath(path string) IRESTClient {
+	dClient.lock.Lock()
+	defer dClient.lock.Unlock()
+
+	dClient.addedPath = path
+	return dClient
+}
+
 func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 	dClient.lock.RLock()
 	defer dClient.lock.RUnlock()
@@ -157,8 +162,8 @@ func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 	}
 
 	url := dClient.endpoint.String()
-	if dClient.getPathParam != "" {
-		url += "/" + dClient.getPathParam
+	if dClient.addedPath != "" {
+		url += "/" + dClient.addedPath
 	}
 
 	bodyBuf, err := json.Marshal(dClient.body)
