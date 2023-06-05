@@ -12,6 +12,7 @@ type BaseObject struct {
 	HTMLUrl string `json:"html_url"`
 }
 
+// BaseObjectReference the reference object
 type BaseObjectReference struct {
 	BaseObject
 	Type TypeReference `json:"type"`

@@ -62,3 +62,15 @@ type IService interface {
 	//   reference: https://developer.pagerduty.com/api-reference/fbc6e9f4ef8eb-update-a-service
 	DeleteService(ctx context.Context, id string) error
 }
+
+type Incident interface {
+	// ListIncidents
+	//  reference: https://developer.pagerduty.com/api-reference/9d0b4b12e36f9-list-incidents
+	ListIncidents(ctx context.Context, params *types.ListIncidentsReq) (*types.ListIncidentsResp, error)
+	// GetIncident
+	//  reference: https://developer.pagerduty.com/api-reference/005299ed43553-get-an-incident
+	GetIncident(ctx context.Context, iid string) (*types.Incident, error)
+	// CreateIncident
+	//  reference: https://developer.pagerduty.com/api-reference/a7d81b0e9200f-create-an-incident
+	CreateIncident(ctx context.Context, payload *types.CreateIncidentPayload) (*types.Incident, error)
+}

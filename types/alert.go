@@ -1,5 +1,14 @@
 package types
 
+type AlertCounts struct {
+	// The count of triggered alerts
+	Triggered int `json:"triggered"`
+	// The count of resolved alerts
+	Resolved int `json:"resolved"`
+	// The total count of alerts
+	All int `json:"all"`
+}
+
 type AlertGroupingParameters struct {
 	Type Type `json:"type"`
 	// The configuration for Intelligent Alert Grouping.
