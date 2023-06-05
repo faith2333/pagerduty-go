@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/faith2333/pagerduty-go/types"
 	"github.com/pkg/errors"
 	"io"
@@ -187,8 +186,6 @@ func (dClient *defaultRestClient) Do(ctx context.Context) ([]byte, error) {
 
 	req.Header.Add("Authorization", "Token token="+dClient.token)
 	req.Header.Add("Content-Type", "application/json")
-
-	fmt.Println(req.URL.String())
 
 	rawResp, err := dClient.httpClient.Do(req)
 	defer func() {
