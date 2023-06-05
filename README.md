@@ -25,5 +25,21 @@ go get github.com/faith2333/pagerduty-go
 
 ## Example
 ```go
+package main
 
+import (
+	"context"
+	"fmt"
+	pagerduty_go "github.com/faith2333/pagerduty-go"
+	"log"
+)
+
+func main() {
+	api := pagerduty_go.NewPagerDuty("YOUR_TOKEN")
+	user, err := api.GetUser(context.Background(), "YOUR_USER_ID")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(user.Name)
+}
 ```
