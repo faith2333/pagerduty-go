@@ -4,8 +4,8 @@
 
 This is a pagerduty library For Go created by [Annan Wang](https://github.com/faith23333).
 It helps you manipulate pagerduty via go easily. includes:
-* CRUD for pagerduty resource object
-* Incident operation 
+* CRUD for pagerduty resource object, like user, service, incident...
+* Event Trigger 
 * Provides a structured resource object definition.
 * Provides a RESTClient.
 
